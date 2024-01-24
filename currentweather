@@ -1,0 +1,39 @@
+#!/usr/bin/python3
+import requests
+import cgi
+from keys import app_id
+
+form = cgi.FieldStorage()
+url = "https://api.openweathermap.org/data/2.5/weather"
+lang = "ru"
+units = form["unit"].value
+q = form["city"].value
+params = {"q": q,
+          "lang": lang,
+          "appid": app_id,
+          "units": units}
+req = requests.get(url, params=params)
+resp = req.json()
+des = resp["weather"][0]["description"]
+temp = resp["main"]["temp"]
+
+units_labels = {
+  "metric": "(°C)",
+  "standard": "(K)",
+  "imperial": "(°F)"
+}
+
+print(f'''Content-type: text/html
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Текущая погода в городе {q}</title>
+</head>
+<body>
+<h1>Текущая погода в городе {q}</h1>
+<p>Температура: {temp} {units_labels[units]}</p>
+<p>Описание: {des}</p>
+</body>
+</html>''')
